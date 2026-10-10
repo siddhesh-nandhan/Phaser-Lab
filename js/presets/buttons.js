@@ -1,5 +1,50 @@
-// Standalone HTML button effects. No Phaser or external libraries required.
-function effectImplementation(button, options = {}) {
+// Starting code for Button effects. "Button Juice" is its own function; the other presets share one
+// implementation and differ only in MODE, which is filled in when the preset is shown.
+
+export const juice = function buttonEffect(button, options) {
+  const { clickScale = 0.9, duration = 120 } = options;
+  let hovering = false;
+  let pressed = false;
+  let animation;
+  let scale = 1;
+  function animate(next) {
+    const current = getComputedStyle(button).transform;
+    animation?.cancel();
+    animation = button.animate([
+      { transform: current === 'none' ? 'scale(1)' : current },
+      { transform: 'scale(' + next + ')' }
+    ], { duration, easing: 'cubic-bezier(0.16,1,0.3,1)', fill: 'forwards' });
+    scale = next;
+  }
+  const down = event => {
+    if (event.button !== 0) return;
+    pressed = true;
+    button.setPointerCapture(event.pointerId);
+    animate(clickScale);
+  };
+  const release = event => {
+    if (!pressed) return;
+    pressed = false;
+    const rect = button.getBoundingClientRect();
+    hovering = event.pointerType !== 'touch' && event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+    animate(1);
+  };
+  const reset = () => { pressed = hovering = false; animate(1); };
+
+  button.addEventListener('pointerdown', down);
+  button.addEventListener('pointerup', release);
+  button.addEventListener('pointercancel', reset);
+  window.addEventListener('blur', reset);
+  return { stop() {
+    animation?.cancel();
+    button.removeEventListener('pointerdown', down);
+    button.removeEventListener('pointerup', release);
+    button.removeEventListener('pointercancel', reset);
+    window.removeEventListener('blur', reset);
+  }};
+};
+
+export function effectImplementation(button, options = {}) {
   const mode = 'MODE';
   const { clickScale = 0.9, duration = 120,
     colors = ['#ff305b', '#1677ff'], onComplete } = options;
@@ -160,14 +205,3 @@ function effectImplementation(button, options = {}) {
     animations.forEach(animation=>animation.cancel());timers.forEach(clearTimeout);
     nodes.forEach(node=>node.remove());button.style.cssText=original;button.disabled=false;}};
 }
-const buttonEffectPresets = {
-  juice: defaultButtonCode,
-  neon: effectImplementation.toString().replace('effectImplementation','buttonEffect').replace("'MODE'","'neon'"),
-  hex: effectImplementation.toString().replace('effectImplementation','buttonEffect').replace("'MODE'","'hex'"),
-  energy: effectImplementation.toString().replace('effectImplementation','buttonEffect').replace("'MODE'","'energy'"),
-  glitch: effectImplementation.toString().replace('effectImplementation','buttonEffect').replace("'MODE'","'glitch'"),
-  shine: effectImplementation.toString().replace('effectImplementation','buttonEffect').replace("'MODE'","'shine'"),
-  dissolve: effectImplementation.toString().replace('effectImplementation','buttonEffect').replace("'MODE'","'dissolve'")
-};
-$('buttonPreset').onchange=()=>{ $('buttonCode').value=buttonEffectPresets[$('buttonPreset').value];applyButton(); };
-$('resetButton').onclick=()=>{ $('buttonCode').value=buttonEffectPresets[$('buttonPreset').value];applyButton(); };

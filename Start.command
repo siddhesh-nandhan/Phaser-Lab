@@ -1,4 +1,4 @@
 #!/bin/zsh
+# Starts the local server (same headers as Vercel) and opens the app. Keep this window open.
 cd "${0:A:h}"
-open http://127.0.0.1:8765
-python3 -m http.server 8765 --bind 127.0.0.1
+python3 serve.py 8765 --open

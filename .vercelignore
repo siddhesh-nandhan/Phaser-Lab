@@ -1,0 +1,5 @@
+# Only the site itself is deployed.
+Start.command
+serve.py
+README.md
+.claude
