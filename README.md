@@ -2,6 +2,8 @@
 
 A browser workbench for game UI effects. Pick a preset or write your own code on the left, watch it run on the right, tune the settings on top.
 
+**Try it: https://siddhesh-nandhan.github.io/phaserlab/**
+
 - **Screen transitions**: two screenshots and a `transition()` function (hexagon dissolve, crossfade, slide), or a Phaser-style `goToScene`. Click the preview to move the origin.
 - **Button effects**: a real HTML button with seven press effects.
 - **Animation lab**: canvas animations or standalone Phaser scenes.
@@ -19,9 +21,11 @@ python3 serve.py --open
 
 The app opens at http://127.0.0.1:8765 (or the next free port). The server sends the same headers as production and disables caching, so edits show on reload. The app uses JavaScript modules, so it needs a server; opening `index.html` from disk does not work.
 
-## Deploy to Vercel
+## Hosting
 
-A static site with no build step. Import the repository in Vercel (framework preset **Other**, no build command, output directory = project root), or run `vercel` in this folder. `vercel.json` sets the security headers and caches the versioned engine files for a year. `.vercelignore` keeps the local server out of the deployment.
+The live site is served by **GitHub Pages** from the `main` branch (repository root) at https://siddhesh-nandhan.github.io/phaserlab/. Every push to `main` updates it within a few minutes. `.nojekyll` makes Pages serve the files as they are, and the security policy is set with a `<meta>` tag in `index.html` and `preview.html`, because Pages cannot send custom headers.
+
+It also deploys to **Vercel** unchanged: a static site with no build step (framework preset **Other**, no build command, output directory = project root). There, `vercel.json` sends the same policy as headers, adds the remaining security headers and caches the versioned engine files for a year. `.vercelignore` keeps the local server out of the deployment.
 
 ## How it works
 
