@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local server for Transition Lab.
+"""Local server for Phaser Lab.
 
 Serves only the files that are deployed (index.html, preview.html, css/, js/, vendor/) and sends the same response
 headers as vercel.json, so what works here works on Vercel. Pages are never cached locally, so edits
@@ -82,7 +82,7 @@ def main():
     else:
         sys.exit(f"No free port between {port} and {port + 19}.")
     url = f"http://127.0.0.1:{server.server_address[1]}/"
-    print(f"Transition Lab running at {url}  (Ctrl+C to stop)")
+    print(f"Phaser Lab running at {url}  (Ctrl+C to stop)")
     if "--open" in sys.argv:
         webbrowser.open(url)
     try:

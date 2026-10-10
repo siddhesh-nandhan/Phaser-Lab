@@ -1,4 +1,4 @@
-# Transition Lab
+# Phaser Lab
 
 A browser workbench for game UI effects. Pick a preset or write your own code on the left, watch it run on the right, tune the settings on top.
 

@@ -1,9 +1,10 @@
 // Saved work: the open tool, the Settings fold, and per tool the preset, the code and changed settings.
 // Kept in this browser only. Storage can be unavailable (private windows), so every access is guarded.
-const KEY = 'transition-lab:v2';
+const KEY = 'phaser-lab:v2';
+const OLD_KEY = 'transition-lab:v2'; // saved before the app was renamed
 
 export function loadState() {
-  try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; }
+  try { return JSON.parse(localStorage.getItem(KEY) ?? localStorage.getItem(OLD_KEY)) || {}; } catch { return {}; }
 }
 
 let timer;

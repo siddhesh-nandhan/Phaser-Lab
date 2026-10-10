@@ -1,4 +1,4 @@
-// Transition Lab: one workbench (preset and settings on top, code on the left, preview on the right)
+// Phaser Lab: one workbench (preset and settings on top, code on the left, preview on the right)
 // that shows whichever tool is open. Tools are described in tools.js.
 import { tools } from './tools.js';
 import { detectSettings, renderSettings, splitValues } from './settings.js';
