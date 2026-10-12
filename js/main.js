@@ -11,6 +11,8 @@ const shortcut = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
 const state = loadState();
 state.tools ||= {};
 const screens = sampleScreens(); // uploads live for this visit only
+const SAMPLE_MODEL = [{ name: 'coin.glb', url: 'assets/models/coin.glb' }];
+let modelFiles = SAMPLE_MODEL; // the chosen model and any files it references, for this visit
 let current = null;
 let settings = [];
 let status = { size: '', fps: null };
@@ -61,6 +63,8 @@ function run() {
   if (tool.extras === 'screens') job.images = { from: screens.from.src, to: screens.to.src };
   if (tool.extras === 'label') job.label = entry.label ?? 'PLAY NOW';
   if (tool.extras === 'geometry') job.geometry = entry.geometry ?? 'auto';
+  if (tool.extras === 'model') job.model = modelFiles.map(({ name, url }) => ({ name, url }));
+  if (tool.trigger) job.loop = entry.loop === false ? 0 : tool.trigger.every;
   if (tool.noise) job.noise = tool.noise;
   status = { size: '', fps: null };
   $('run').textContent = tool.runLabel;
@@ -97,7 +101,65 @@ function setSettingsOpen(open) {
   saveState(state);
 }
 
-// ---- Extras next to the preset: screenshots, button label, preview shape -----
+// ---- Extras next to the preset: screenshots, button label, preview shape, model -----
+// The model picker. A .gltf can be chosen together with its .bin and texture files.
+function modelChip() {
+  const chip = document.createElement('label');
+  chip.className = 'upload';
+  const icon = document.createElement('span');
+  icon.className = 'model-icon';
+  icon.setAttribute('aria-hidden', 'true');
+  icon.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg>';
+  const text = document.createElement('span');
+  text.className = 'upload-text';
+  const heading = document.createElement('span');
+  heading.className = 'upload-title';
+  heading.textContent = 'Model';
+  const file = document.createElement('span');
+  file.className = 'upload-name';
+  const main = modelFiles.find(f => /\.(glb|gltf|fbx)$/i.test(f.name));
+  file.textContent = modelFiles === SAMPLE_MODEL ? 'Sample coin' : main?.name ?? 'Choose a model';
+  text.append(heading, file);
+  const replace = document.createElement('span');
+  replace.className = 'replace';
+  replace.textContent = 'Replace';
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.multiple = true;
+  input.accept = '.glb,.gltf,.fbx,.bin,.png,.jpg,.jpeg,.webp';
+  input.className = 'visually-hidden';
+  input.addEventListener('change', () => {
+    const chosen = [...input.files];
+    if (!chosen.length) return;
+    if (!chosen.some(f => /\.(glb|gltf|fbx)$/i.test(f.name))) {
+      showStatus({ text: 'Choose a .glb, .gltf or .fbx file (with its .bin and textures, if it has them).', error: true });
+      return;
+    }
+    if (modelFiles !== SAMPLE_MODEL) for (const old of modelFiles) URL.revokeObjectURL(old.url);
+    modelFiles = chosen.map(f => ({ name: f.name, url: URL.createObjectURL(f) }));
+    file.textContent = modelFiles.find(f => /\.(glb|gltf|fbx)$/i.test(f.name)).name;
+    run();
+  });
+  const reset = document.createElement('button');
+  reset.type = 'button';
+  reset.className = 'chip-reset';
+  reset.textContent = 'Use sample';
+  reset.hidden = modelFiles === SAMPLE_MODEL;
+  reset.addEventListener('click', event => {
+    event.preventDefault();
+    for (const old of modelFiles) URL.revokeObjectURL(old.url);
+    modelFiles = SAMPLE_MODEL;
+    drawExtras();
+    run();
+  });
+  chip.append(icon, text, replace, input);
+  const group = document.createElement('div');
+  group.className = 'extras';
+  group.append(chip, reset);
+  input.addEventListener('change', () => { reset.hidden = modelFiles === SAMPLE_MODEL; });
+  return group;
+}
+
 function screenChip(name, title) {
   const chip = document.createElement('label');
   chip.className = 'upload';
@@ -155,6 +217,8 @@ function drawExtras() {
     input.value = entry.label ?? 'PLAY NOW';
     input.addEventListener('input', () => { entry.label = input.value; saveState(state); runSoon(400); });
     extras.append(field('Button label', input));
+  } else if (tool.extras === 'model') {
+    extras.append(modelChip());
   } else if (tool.extras === 'geometry') {
     const select = document.createElement('select');
     for (const [value, text] of [['auto', 'Auto'], ['plane', 'Plane'], ['box', 'Box (volume shaders)']]) select.add(new Option(text, value));
@@ -201,6 +265,13 @@ function openTool(id) {
   $('title').textContent = tool.title;
   $('subtitle').textContent = tool.subtitle;
   $('codeTitle').textContent = tool.codeTitle;
+  // Tools with a trigger (3D models) get a Collect button and a Loop toggle; Run becomes secondary.
+  $('trigger').hidden = $('loop').hidden = !tool.trigger;
+  $('run').classList.toggle('primary', !tool.trigger);
+  if (tool.trigger) {
+    $('trigger').textContent = tool.trigger.label;
+    $('loop').setAttribute('aria-pressed', String(saved().loop !== false));
+  }
   $('help').innerHTML = tool.help;
   $('code').value = saved().code;
   drawPresets();
@@ -222,6 +293,14 @@ for (const [id, tool] of Object.entries(tools)) {
 $('preset').addEventListener('change', () => { if ($('preset').value !== 'custom') usePreset($('preset').value); });
 $('restore').addEventListener('click', () => usePreset(saved().preset));
 $('run').addEventListener('click', run);
+$('trigger').addEventListener('click', () => preview.send({ type: 'trigger' }));
+$('loop').addEventListener('click', () => {
+  const on = $('loop').getAttribute('aria-pressed') !== 'true';
+  $('loop').setAttribute('aria-pressed', String(on));
+  saved().loop = on;
+  saveState(state);
+  preview.send({ type: 'loop', every: on ? tools[current].trigger.every : 0 });
+});
 $('stop').addEventListener('click', () => preview.stop());
 $('settingsToggle').addEventListener('click', () => setSettingsOpen($('settingsToggle').getAttribute('aria-expanded') !== 'true'));
 

@@ -6,6 +6,8 @@ Both bundled libraries are distributed under the MIT License, reproduced below.
 |---|---|---|
 | `phaser-3.90.0.min.js` | Phaser 3.90.0, Copyright (c) Phaser Studio Inc. | https://github.com/phaserjs/phaser |
 | `three-r160.min.js` | three.js r160, Copyright (c) three.js authors | https://github.com/mrdoob/three.js |
+| `three-r160/` | three.js r160 module build and add-ons (`GLTFLoader`, `FBXLoader`, `SkeletonUtils`, `BufferGeometryUtils`, `NURBSCurve`, `NURBSUtils`), Copyright (c) three.js authors. The add-ons' `from 'three'` imports were changed to relative paths. | https://github.com/mrdoob/three.js |
+| `three-r160/examples/jsm/libs/fflate.module.js` | fflate, Copyright (c) Arjun Barrett (MIT) | https://github.com/101arrowz/fflate |
 
 ## MIT License
 

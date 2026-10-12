@@ -5,6 +5,7 @@ import { runTransition } from './transition.js';
 import { runButton } from './button.js';
 import { runAnimation } from './animation.js';
 import { runShader } from './shader.js';
+import { runModel } from './model.js';
 
 const params = new URLSearchParams(location.search);
 const runId = params.get('run');
@@ -54,8 +55,9 @@ function loadScript(src) {
   });
 }
 
-const runners = { transition: runTransition, button: runButton, animation: runAnimation, shader: runShader };
-let stopJob = null;
+const runners = { transition: runTransition, button: runButton, animation: runAnimation, shader: runShader, model: runModel };
+// A runner returns a stop function, or { stop, trigger, setLoop } when its effect can be fired on demand.
+let stopJob = null, controls = {};
 
 addEventListener('message', async event => {
   if (event.source !== parent || event.origin !== location.origin) return;
@@ -64,10 +66,17 @@ addEventListener('message', async event => {
     stopHeartbeat();
     stopJob?.();
     stopJob = null;
+    controls = {};
     report('stopped', 'Stopped');
+  } else if (type === 'trigger') {
+    controls.trigger?.();
+  } else if (type === 'loop') {
+    controls.setLoop?.(event.data.every);
   } else if (type === 'job' && !stopJob) {
     try {
-      stopJob = (await runners[job.kind](job)) || (() => {});
+      const handle = await runners[job.kind](job);
+      controls = typeof handle === 'object' && handle ? handle : {};
+      stopJob = (typeof handle === 'function' ? handle : handle?.stop) || (() => {});
     } catch (error) {
       report('error', error.message);
     }

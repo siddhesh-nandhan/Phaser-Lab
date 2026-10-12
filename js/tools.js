@@ -4,6 +4,7 @@ import * as transitions from './presets/transitions.js';
 import * as buttons from './presets/buttons.js';
 import * as animation from './presets/animation.js';
 import * as shaders from './presets/shaders.js';
+import * as models from './presets/models.js';
 
 const usesPhaser = code => /\bPhaser\b/.test(code) && !/\bfunction\s+goToScene\s*\(/.test(code);
 const buttonPreset = mode => buttons.effectImplementation.toString()
@@ -72,5 +73,22 @@ export const tools = {
     engine: () => 'three',
     noise: shaders.noiseGlsl,
     help: 'Write a material factory such as <code>createFireMaterial()</code>, <code>createAnimation({ THREE, renderer, scene, camera, options })</code> returning an update function, or a complete Three.js scene. Material previews get a mesh, a camera, <code>NOISE_GLSL</code> and an animated <code>time</code> uniform. Drag the preview to orbit.',
+  },
+  models: {
+    tab: '3D models',
+    title: '3D models',
+    subtitle: 'Build a pickup effect for your model, then press Collect to play it.',
+    codeTitle: 'Effect code',
+    runLabel: 'Run',
+    kind: 'model',
+    extras: 'model',
+    trigger: { label: 'Collect', every: 2.4 },
+    presets: [
+      { id: 'fly', label: 'Collect: fly to counter', code: models.flyToCounter.toString() },
+      { id: 'pop', label: 'Collect: sparkle pop', code: models.sparklePop.toString() },
+      { id: 'viewer', label: 'Model viewer', code: models.viewer.toString() },
+    ],
+    engine: () => '',
+    help: 'Write <code>createEffect({ THREE, scene, camera, renderer, model, clone, animations, options })</code> and return <code>{ update(time, delta), play() }</code>. <code>play()</code> is the moment the item is collected: it runs when you press Collect, tap the model, or while Loop is on. <code>model</code> is your file, centred and scaled to fit a unit cube; <code>clone()</code> makes a lightweight copy; <code>animations</code> holds any clips in the file. A <code>.gltf</code> that uses separate <code>.bin</code> or texture files needs them chosen together. Drag the preview to orbit.',
   },
 };

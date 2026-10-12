@@ -119,7 +119,7 @@ button.primary:hover { background: #e6e6e6; }
 }
 .toggle[aria-expanded="true"]::after { transform: rotate(-135deg) translate(-1px, -1px); }
 .dock-settings {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px 20px; align-items: end;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 12px 14px; align-items: end;
   padding-top: 16px; border-top: 1px solid var(--hairline-soft);
 }
 .dock-settings .check { display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 0 14px; margin-top: 26px; background: var(--surface-2); border-radius: var(--r-input); }
@@ -135,6 +135,8 @@ button.primary:hover { background: #e6e6e6; }
 .upload-text { display: flex; flex-direction: column; min-width: 0; max-width: 140px; }
 .upload-title { font-size: 14px; font-weight: 600; white-space: nowrap; }
 .upload-name { font-size: 13px; font-weight: 400; color: var(--ink-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.model-icon { flex: none; display: grid; place-items: center; width: 64px; height: 44px; border-radius: 10px; color: #e8c86a; background: radial-gradient(circle at 30% 25%, #3a3320, #18160f); }
+.chip-reset { min-height: 40px; padding: 8px 14px; font-size: 13px; background: transparent; box-shadow: inset 0 0 0 1px var(--hairline); }
 .replace { flex: none; padding: 6px 14px; border-radius: var(--r-pill); font-size: 13px; font-weight: 500; color: var(--on-primary); background: var(--ink); }
 
 .code-pane { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; padding: 20px; background: var(--surface-1); border-radius: var(--r-card); }
@@ -155,7 +157,11 @@ textarea:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--blue); }
 .workspace { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .toolbar { flex: none; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
 .toolbar p { margin: 0; color: var(--ink-muted); }
-.actions { display: flex; gap: 8px; }
+.toolbar > div:first-child { min-width: 0; }
+.actions { flex: none; display: flex; justify-content: flex-end; gap: 8px; }
+.loop { gap: 8px; background: transparent; box-shadow: inset 0 0 0 1px var(--hairline); }
+.loop::before { content: ""; width: 16px; height: 16px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--ink-muted); transition: background .2s var(--ease), box-shadow .2s var(--ease); }
+.loop[aria-pressed="true"]::before { background: var(--blue); box-shadow: inset 0 0 0 4px var(--blue), inset 0 0 0 6px var(--surface-1); }
 
 /* The stage: a neutral dot-grid canvas. Preview frames are transparent and fill it. */
 .stage {
@@ -191,6 +197,7 @@ textarea:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--blue); }
   .field, .toggle, .extras { flex: 1 1 100%; margin-left: 0; }
   .extras .field { flex: 1 1 100%; }
   .toolbar { flex-direction: column; align-items: flex-start; }
+  .actions { flex-wrap: wrap; justify-content: flex-start; }
   .stage { flex: none; height: clamp(240px, 70vw, 440px); }
   textarea { flex: none; height: 300px; }
   .shortcut { display: none; }

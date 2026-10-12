@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Local server for Phaser Lab.
 
-Serves only the files that are deployed (index.html, preview.html, css/, js/, vendor/) and sends the same response
+Serves only the files that are deployed (index.html, preview.html, assets/, css/, js/, vendor/) and sends the same response
 headers as vercel.json, so what works here works on Vercel. Pages are never cached locally, so edits
 show up on reload. Usage: python3 serve.py [port] [--open]
 """
@@ -15,9 +15,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 PUBLIC = {"index.html", "preview.html"}
-PUBLIC_DIRS = ("css/", "js/", "vendor/")
+PUBLIC_DIRS = ("assets/", "css/", "js/", "vendor/")
 TYPES = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8",
-         ".js": "text/javascript; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png"}
+         ".js": "text/javascript; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png",
+         ".glb": "model/gltf-binary", ".gltf": "model/gltf+json", ".fbx": "application/octet-stream"}
 
 
 def load_rules():

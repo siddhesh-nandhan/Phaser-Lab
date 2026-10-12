@@ -45,8 +45,13 @@ export class Preview {
   }
 
   stop() {
+    this.send({ type: 'stop' });
+  }
+
+  // Messages for a running effect: { type: 'trigger' } fires it, { type: 'loop', every } repeats it.
+  send(message) {
     if (!this.frame) return;
-    this.frame.contentWindow?.postMessage({ type: 'stop' }, location.origin);
+    this.frame.contentWindow?.postMessage(message, location.origin);
   }
 
   // Remove the frame entirely; nothing keeps running in the background.
